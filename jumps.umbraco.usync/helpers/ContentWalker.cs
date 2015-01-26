@@ -143,7 +143,8 @@ namespace jumps.umbraco.usync.helpers
                 var root = _mediaService.GetByLevel(1).Where(x => x.Name == rootName).FirstOrDefault();
                 if (root != null)
                 {
-                    return GetLastId(_mediaService, root.Id, bits, 2);
+                    var level = bits.Length < 2 ? bits.Length : 2;
+                    return GetLastId(_mediaService, root.Id, bits, level);
                 }
             }
             return -1;
@@ -153,6 +154,11 @@ namespace jumps.umbraco.usync.helpers
         private int GetLastId(IMediaService _service, int parentId, string[] bits, int level)
         {
             LogHelper.Debug<MediaWalker>("Recursing {0} - {1}", () => level, () => parentId);
+
+            if (level == 1)
+            {
+                return parentId;
+            }
 
             var here = _service.GetChildren(parentId).Where(x => x.Name == bits[level - 1]).FirstOrDefault();
             // var here = _service.GetChildrenByName(parentId, bits[level - 1]).FirstOrDefault();
